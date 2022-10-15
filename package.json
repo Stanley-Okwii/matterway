@@ -1,0 +1,29 @@
+{
+    "name": "matterway",
+    "version": "1.0.0",
+    "description": "Amazon Web Crawler",
+    "main": "src/crawler/app.ts",
+    "scripts": {
+        "start": "tsc && node build/crawler/app.js",
+        "debug": "tsc && node --inspect-brk build/crawler/app.js",
+        "install-chromium": "node node_modules/puppeteer/install.js"
+    },
+    "author": "Stanley Okwii",
+    "license": "MIT",
+    "private": true,
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Stanley-Okwii/matterway.git"
+    },
+    "devDependencies": {
+        "@types/node": "^18.8.5",
+        "@types/prompts": "^2.4.1",
+        "@types/puppeteer": "^5.4.6",
+        "typescript": "^4.8.4"
+    },
+    "dependencies": {
+        "prompts": "^2.4.2",
+        "puppeteer": "^18.2.1",
+        "puppeteer-core": "^18.2.1"
+    }
+}
