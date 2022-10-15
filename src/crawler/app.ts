@@ -1,16 +1,13 @@
 import * as puppeteer from "puppeteer";
 import * as prompts from "prompts";
-import { getRandomInt } from "../utils";
 
-const goodReads: string =
-  "https://www.goodreads.com/choiceawards/best-books-2020";
-
-const amazon: string = "https://www.amazon.com/";
+import { getRandomNumber } from "../utils/helpers";
+import { password, email, goodReadsLink, amazonLink } from "../utils/constants";
 
 (async () => {
   let browser = await puppeteer.launch();
   let page = await browser.newPage();
-  await page.goto(goodReads);
+  await page.goto(goodReadsLink);
   const choices = await page.$$eval(
     "#categories > div > div.category",
     (elements) => {
@@ -42,7 +39,7 @@ const amazon: string = "https://www.amazon.com/";
     }
   );
 
-  const randomBookTitle = bookTitles[getRandomInt(0, 19)];
+  const randomBookTitle = bookTitles[getRandomNumber(0, 19)];
 
   await page.close();
   await browser.close();
@@ -50,19 +47,37 @@ const amazon: string = "https://www.amazon.com/";
   browser = await puppeteer.launch({
     headless: false,
     // devtools: true,
-    slowMo: 250,
+    // slowMo: 250,
   });
   page = await browser.newPage();
   await page.setUserAgent(
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
   );
-  await page.setViewport({
-    width: 1240,
-    height: 1080,
-  });
+  await page.setViewport({ width: 1200, height: 1822 });
 
-  // Search book on amazon
-  await page.goto(amazon);
+  // Navigate book on amazon.com
+  await page.goto(amazonLink);
+
+  // Login into amazon if password and email exist
+  if (email && password) {
+    await page.waitForSelector(
+      "#nav-signin-tooltip > .nav-action-button > .nav-action-inner"
+    );
+    await page.click(
+      " #nav-signin-tooltip > .nav-action-button > .nav-action-inner"
+    );
+
+    await page.waitForSelector("#ap_email");
+    await page.type("#ap_email", email);
+
+    await page.click("#continue");
+
+    await page.waitForSelector("#ap_password");
+    await page.type("#ap_password", password);
+
+    await page.click("#signInSubmit");
+  }
+
   await page.waitForSelector("#searchDropdownBox");
   const dismissPopUp = await page.$("input[data-action-type='DISMISS']");
 
@@ -70,8 +85,12 @@ const amazon: string = "https://www.amazon.com/";
   if (dismissPopUp) {
     await page.click("input[data-action-type='DISMISS']");
   }
+
+  // Select book category to optimize search
   await page.click("#nav-search-dropdown-card");
   await page.select("#searchDropdownBox", "search-alias=stripbooks-intl-ship");
+
+  // Type random book title in the search input
   await page.type("#twotabsearchtextbox", randomBookTitle);
   await page.click("#nav-search-submit-button");
 
@@ -83,6 +102,8 @@ const amazon: string = "https://www.amazon.com/";
       "div.s-main-slot.s-result-list.s-search-results.sg-row > div:nth-child(2) > div > div > div > div > div > div.sg-col.sg-col-4-of-12.sg-col-8-of-16.sg-col-12-of-20.s-list-col-right > div > div > div.sg-row > div.sg-col.sg-col-4-of-12.sg-col-4-of-16.sg-col-4-of-20 > div > div.a-section.a-spacing-none.a-spacing-top-mini > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > a"
     ),
   ]);
+
+  await page.waitForSelector("#add-to-cart-button");
   await page.$eval(
     "#add-to-cart-button",
     (addToCartButton: any) => addToCartButton && addToCartButton.click()
