@@ -26,6 +26,19 @@ export const waitForSelectorAndType = async (
   await page.type(selector, value);
 };
 
+export const loginToAmazon = async (page: Page, email:string, password:string) => {
+  await waitForSelectorAndClick(
+    page,
+    "#nav-signin-tooltip > .nav-action-button > .nav-action-inner"
+  );
+  await waitForSelectorAndType(page, "#ap_email", email);
+  await waitForSelectorAndClick(page, "#continue");
+
+  await waitForSelectorAndType(page, "#ap_password", password);
+
+  await waitForSelectorAndClick(page, "#signInSubmit");
+}
+
 export const getRandomNumber = (min: number, max: number): number => {
   min = Math.ceil(min);
   max = Math.floor(max);
