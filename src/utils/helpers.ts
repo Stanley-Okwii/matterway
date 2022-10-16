@@ -1,7 +1,7 @@
 import { Page } from "puppeteer";
 
 export const waitForSelector = async (page: Page, selector: string) => {
-  return page.waitForSelector(selector, { timeout: 10000 });
+  return page.waitForSelector(selector);
 };
 
 export const waitForSelectorAndClick = async (page: Page, selector: string) => {
@@ -26,7 +26,11 @@ export const waitForSelectorAndType = async (
   await page.type(selector, value);
 };
 
-export const loginToAmazon = async (page: Page, email:string, password:string) => {
+export const loginToAmazon = async (
+  page: Page,
+  email: string,
+  password: string
+) => {
   await waitForSelectorAndClick(
     page,
     "#nav-signin-tooltip > .nav-action-button > .nav-action-inner"
@@ -37,7 +41,7 @@ export const loginToAmazon = async (page: Page, email:string, password:string) =
   await waitForSelectorAndType(page, "#ap_password", password);
 
   await waitForSelectorAndClick(page, "#signInSubmit");
-}
+};
 
 export const getRandomNumber = (min: number, max: number): number => {
   min = Math.ceil(min);

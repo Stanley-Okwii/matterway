@@ -1,5 +1,5 @@
 import * as puppeteer from "puppeteer";
-import { Browser, Page } from "puppeteer";
+import { Browser, Page, ElementHandle } from "puppeteer";
 
 import { password, email, amazonLink, userAgent } from "../utils/constants";
 import { waitForElementAndClick, loginToAmazon } from "../utils/helpers";
@@ -9,6 +9,7 @@ export const addBookToAmazonCart = async (bookTitle: string) => {
     headless: false,
   });
   const page: Page = await browser.newPage();
+  await page.setDefaultNavigationTimeout(0);
 
   try {
     await page.setUserAgent(userAgent);
@@ -16,6 +17,14 @@ export const addBookToAmazonCart = async (bookTitle: string) => {
 
     // Navigate book on amazon.com
     await page.goto(amazonLink);
+
+    // Dismiss change delivery country pop up modal
+    const dismissPopUp: ElementHandle<Element> | null = await page.$(
+      "input[data-action-type='DISMISS']"
+    );
+    if (dismissPopUp) {
+      await page.click("input[data-action-type='DISMISS']");
+    }
 
     // Login into amazon if password and email exist
     if (email && password) {
@@ -46,7 +55,7 @@ export const addBookToAmazonCart = async (bookTitle: string) => {
     }
 
     // Add book to cart
-    await waitForElementAndClick(page, "#add-to-cart-button");
+    await waitForElementAndClick(page, "input[value='Add to Cart']");
 
     // Navigate to the checkout page
     await waitForElementAndClick(

@@ -1,6 +1,6 @@
 # MATTERWAY
 
-This is a web crawler app that allows a user to place an order for a book on amazon. A selects a book category from goodreads and the
+This is a web crawler app that allows a user to checkout an order for a random book in the user's preferred category on amazon.
 
 ## Pre-requisites
 
