@@ -99,7 +99,6 @@ import { password, email, goodReadsLink, amazonLink } from "../utils/constants";
     '//a[contains(text(), "Paperback")]'
   );
   await PaperbackLink.click();
-  await page.waitForNavigation();
 
   // Add book to cart
   await page.waitForSelector("#add-to-cart-button");
