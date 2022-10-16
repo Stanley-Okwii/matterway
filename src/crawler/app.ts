@@ -46,7 +46,7 @@ import { password, email, goodReadsLink, amazonLink } from "../utils/constants";
 
   browser = await puppeteer.launch({
     headless: false,
-    // devtools: true,
+    devtools: true,
     // slowMo: 250,
   });
   page = await browser.newPage();
@@ -57,6 +57,12 @@ import { password, email, goodReadsLink, amazonLink } from "../utils/constants";
 
   // Navigate book on amazon.com
   await page.goto(amazonLink);
+
+  // Dismiss change country pop up modal
+  const dismissPopUp = await page.$("input[data-action-type='DISMISS']");
+  if (dismissPopUp) {
+    await page.click("input[data-action-type='DISMISS']");
+  }
 
   // Login into amazon if password and email exist
   if (email && password) {
@@ -78,15 +84,8 @@ import { password, email, goodReadsLink, amazonLink } from "../utils/constants";
     await page.click("#signInSubmit");
   }
 
-  await page.waitForSelector("#searchDropdownBox");
-  const dismissPopUp = await page.$("input[data-action-type='DISMISS']");
-
-  // Dismiss change country pop up modal
-  if (dismissPopUp) {
-    await page.click("input[data-action-type='DISMISS']");
-  }
-
   // Select book category to optimize search
+  await page.waitForSelector("#searchDropdownBox");
   await page.click("#nav-search-dropdown-card");
   await page.select("#searchDropdownBox", "search-alias=stripbooks-intl-ship");
 
@@ -94,21 +93,21 @@ import { password, email, goodReadsLink, amazonLink } from "../utils/constants";
   await page.type("#twotabsearchtextbox", randomBookTitle);
   await page.click("#nav-search-submit-button");
 
+  // Select first result on the page
   await page.waitForSelector("div[data-cel-widget='MAIN-SEARCH_RESULTS-1']");
 
-  await Promise.all([
-    page.waitForNavigation(),
-    page.click(
-      "div.s-main-slot.s-result-list.s-search-results.sg-row > div:nth-child(2) > div > div > div > div > div > div.sg-col.sg-col-4-of-12.sg-col-8-of-16.sg-col-12-of-20.s-list-col-right > div > div > div.sg-row > div.sg-col.sg-col-4-of-12.sg-col-4-of-16.sg-col-4-of-20 > div > div.a-section.a-spacing-none.a-spacing-top-mini > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > a"
-    ),
-  ]);
+  // Select the first book available in Paperback format
+  const [PaperbackLink]: any = await page.$x('//a[contains(text(), "Paperback")]');
+  await PaperbackLink.click();
 
+  // Add book to cart
   await page.waitForSelector("#add-to-cart-button");
   await page.$eval(
     "#add-to-cart-button",
     (addToCartButton: any) => addToCartButton && addToCartButton.click()
   );
 
+  // Navigate to the checkout page
   await page.waitForSelector("#NATC_SMART_WAGON_CONF_MSG_SUCCESS");
   await page.$eval(
     "input[data-feature-id='proceed-to-checkout-action']",
