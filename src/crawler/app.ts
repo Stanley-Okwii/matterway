@@ -46,8 +46,6 @@ import { password, email, goodReadsLink, amazonLink } from "../utils/constants";
 
   browser = await puppeteer.launch({
     headless: false,
-    devtools: true,
-    // slowMo: 250,
   });
   page = await browser.newPage();
   await page.setUserAgent(
@@ -97,8 +95,11 @@ import { password, email, goodReadsLink, amazonLink } from "../utils/constants";
   await page.waitForSelector("div[data-cel-widget='MAIN-SEARCH_RESULTS-1']");
 
   // Select the first book available in Paperback format
-  const [PaperbackLink]: any = await page.$x('//a[contains(text(), "Paperback")]');
+  const [PaperbackLink]: any = await page.$x(
+    '//a[contains(text(), "Paperback")]'
+  );
   await PaperbackLink.click();
+  await page.waitForNavigation();
 
   // Add book to cart
   await page.waitForSelector("#add-to-cart-button");
@@ -108,7 +109,9 @@ import { password, email, goodReadsLink, amazonLink } from "../utils/constants";
   );
 
   // Navigate to the checkout page
-  await page.waitForSelector("#NATC_SMART_WAGON_CONF_MSG_SUCCESS");
+  await page.waitForSelector(
+    "input[data-feature-id='proceed-to-checkout-action']"
+  );
   await page.$eval(
     "input[data-feature-id='proceed-to-checkout-action']",
     (checkoutButton: any) => checkoutButton && checkoutButton.click()

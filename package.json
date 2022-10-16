@@ -5,7 +5,6 @@
     "main": "src/crawler/app.ts",
     "scripts": {
         "start": "tsc && node build/crawler/app.js",
-        "debug": "tsc && node --inspect-brk build/crawler/app.js",
         "install-chromium": "node node_modules/puppeteer/install.js"
     },
     "author": "Stanley Okwii",
